@@ -1,0 +1,24 @@
+# SlopReveal — Claude (Anthropic) provider example
+#
+# Copy this file to your working directory as slopreveal.toml, or pass it
+# explicitly with: slopreveal --config claude.toml <binary>
+#
+# Set your key: export ANTHROPIC_API_KEY=sk-ant-...
+
+[provider]
+name    = "claude"
+model   = "claude-sonnet-4-6"   # or claude-opus-4-8 for best quality
+# api_key = "sk-ant-..."        # hard-coded fallback (prefer env var)
+timeout = 120                   # seconds per request
+
+[disasm]
+arch       = "auto"             # auto-detects from ELF/PE header
+chunk_size = 200                # instructions per AI request
+
+[cache]
+enabled = true
+dir     = ".slopreveal_cache"
+
+[output]
+dir      = "out"
+language = "c"                  # c | cpp | rust | python

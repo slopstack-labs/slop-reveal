@@ -40,3 +40,6 @@ slopreveal-init-prompt.txt
 
 # vcpkg build artifacts
 vcpkg_installed/
+
+# Claude Code local settings (machine-specific)
+.claude/

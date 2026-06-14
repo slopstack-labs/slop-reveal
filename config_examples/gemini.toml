@@ -1,0 +1,24 @@
+# SlopReveal — Gemini (Google) provider example
+#
+# Set your key: export GEMINI_API_KEY=AIza...
+# Get a key at: https://aistudio.google.com/app/apikey
+#
+# Supported models: gemini-2.0-flash, gemini-2.5-pro, gemini-2.5-flash
+
+[provider]
+name    = "gemini"
+model   = "gemini-2.0-flash"   # fast and free-tier friendly
+# api_key = "AIza..."           # hard-coded fallback (prefer env var)
+timeout = 120
+
+[disasm]
+arch       = "auto"
+chunk_size = 200
+
+[cache]
+enabled = true
+dir     = ".slopreveal_cache"
+
+[output]
+dir      = "out"
+language = "c"

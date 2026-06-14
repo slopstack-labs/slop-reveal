@@ -1,0 +1,27 @@
+# SlopReveal — Ollama (local) provider example
+#
+# Requires Ollama running locally: https://ollama.com
+# Pull a code model first:
+#   ollama pull codellama
+#   ollama pull deepseek-coder
+#   ollama pull qwen2.5-coder
+#
+# No API key needed — runs entirely on your machine.
+
+[provider]
+name     = "ollama"
+model    = "codellama"          # any model pulled via `ollama pull`
+base_url = "http://localhost:11434"
+timeout  = 300                  # local models can be slower; increase if needed
+
+[disasm]
+arch       = "auto"
+chunk_size = 100                # smaller chunks work better with smaller local models
+
+[cache]
+enabled = true
+dir     = ".slopreveal_cache"
+
+[output]
+dir      = "out"
+language = "c"

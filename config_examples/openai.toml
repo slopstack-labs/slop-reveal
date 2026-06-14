@@ -1,0 +1,25 @@
+# SlopReveal — OpenAI provider example
+#
+# Set your key: export OPENAI_API_KEY=sk-...
+#
+# Supported models: gpt-4o, gpt-4o-mini, o1, o3, o4-mini
+# Use gpt-4o for best speed/quality balance.
+
+[provider]
+name    = "openai"
+model   = "gpt-4o"
+# api_key = "sk-..."            # hard-coded fallback (prefer env var)
+# base_url = "https://api.openai.com"  # override for compatible endpoints
+timeout = 120
+
+[disasm]
+arch       = "auto"
+chunk_size = 200
+
+[cache]
+enabled = true
+dir     = ".slopreveal_cache"
+
+[output]
+dir      = "out"
+language = "c"
