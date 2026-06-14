@@ -14,19 +14,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
+      - name: Cache vcpkg packages
+        uses: actions/cache@v4
         with:
-          vcpkgGitCommitId: 'a42af01b72c28a8e1d7b48107b33e4f286a55ef6'
+          path: C:\vcpkg\packages
+          key: vcpkg-x64-windows-${{ hashFiles('vcpkg.json') }}
+          restore-keys: vcpkg-x64-windows-
 
       - name: Install dependencies via vcpkg
-        run: vcpkg install --triplet x64-windows
+        env:
+          VCPKG_BINARY_SOURCES: "clear"
+        run: |
+          & "$env:VCPKG_INSTALLATION_ROOT\vcpkg.exe" install --triplet x64-windows
 
       - name: Configure
         run: |
           cmake -S . -B build `
             -DCMAKE_BUILD_TYPE=Release `
-            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" `
             -DVCPKG_TARGET_TRIPLET=x64-windows
 
       - name: Build

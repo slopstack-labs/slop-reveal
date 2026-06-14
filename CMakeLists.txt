@@ -50,15 +50,23 @@ else()
         target_link_libraries(slopreveal PRIVATE ${CAPSTONE_LIBRARIES})
         target_link_directories(slopreveal PRIVATE ${CAPSTONE_LIBRARY_DIRS})
     else()
-        # Homebrew / manual install: honour CMAKE_PREFIX_PATH
-        find_path(CAPSTONE_INCLUDE_DIR capstone/capstone.h)
-        find_library(CAPSTONE_LIBRARY NAMES capstone)
+        # Fallback: explicit paths via -DCAPSTONE_INCLUDE_DIR / -DCAPSTONE_LIBRARY
+        # (used by macOS CI where brew prefix must be passed explicitly), or
+        # CMake's standard search using CMAKE_PREFIX_PATH.
+        find_path(CAPSTONE_INCLUDE_DIR
+            NAMES capstone/capstone.h
+            HINTS ${CMAKE_PREFIX_PATH}
+            PATH_SUFFIXES include)
+        find_library(CAPSTONE_LIBRARY
+            NAMES capstone
+            HINTS ${CMAKE_PREFIX_PATH}
+            PATH_SUFFIXES lib)
         if(NOT CAPSTONE_INCLUDE_DIR OR NOT CAPSTONE_LIBRARY)
             message(FATAL_ERROR
                 "Capstone not found.\n"
-                "  Linux:  sudo apt install libcapstone-dev\n"
-                "  macOS:  brew install capstone\n"
-                "  Windows: add capstone to vcpkg.json and pass the toolchain file")
+                "  Linux:   sudo apt install libcapstone-dev\n"
+                "  macOS:   brew install capstone\n"
+                "  Windows: add capstone to vcpkg.json and pass -DCMAKE_TOOLCHAIN_FILE")
         endif()
         target_include_directories(slopreveal PRIVATE ${CAPSTONE_INCLUDE_DIR})
         target_link_libraries(slopreveal PRIVATE ${CAPSTONE_LIBRARY})

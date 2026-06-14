@@ -26,10 +26,19 @@ jobs:
 
       - name: Configure
         run: |
+          CAPSTONE_PREFIX=$(brew --prefix capstone)
+          OPENSSL_PREFIX=$(brew --prefix openssl)
+          CURL_PREFIX=$(brew --prefix curl)
+
+          # Set PKG_CONFIG_PATH so cmake's pkg_check_modules finds brew packages
+          export PKG_CONFIG_PATH="$CAPSTONE_PREFIX/lib/pkgconfig:$OPENSSL_PREFIX/lib/pkgconfig:$CURL_PREFIX/lib/pkgconfig"
+
           cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=Release \
-            -DOPENSSL_ROOT_DIR=$(brew --prefix openssl) \
-            -DCMAKE_PREFIX_PATH=$(brew --prefix)
+            -DOPENSSL_ROOT_DIR="$OPENSSL_PREFIX" \
+            -DCMAKE_PREFIX_PATH="$CAPSTONE_PREFIX;$OPENSSL_PREFIX;$CURL_PREFIX" \
+            -DCAPSTONE_INCLUDE_DIR="$CAPSTONE_PREFIX/include" \
+            -DCAPSTONE_LIBRARY="$CAPSTONE_PREFIX/lib/libcapstone.dylib"
 
       - name: Build
         run: cmake --build build --parallel
