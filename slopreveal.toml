@@ -1,0 +1,21 @@
+# SlopReveal configuration file
+# CLI flags override these values; environment variables override this file.
+
+[provider]
+name    = "claude"          # claude | ollama | openai | gemini
+# api_key = "sk-..."        # or set ANTHROPIC_API_KEY / OPENAI_API_KEY / GEMINI_API_KEY
+model   = "claude-sonnet-4-6"
+# base_url = "http://localhost:11434"  # uncomment for ollama
+timeout = 120               # seconds per request
+
+[disasm]
+arch       = "auto"         # auto | x86 | x64 | arm | arm64 | mips
+chunk_size = 200            # assembly instructions per AI request
+
+[cache]
+enabled = true
+dir     = ".slopreveal_cache"
+
+[output]
+dir      = "out"
+language = "c"              # c | cpp | rust | python

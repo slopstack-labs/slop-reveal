@@ -1,0 +1,9 @@
+{
+  "name": "slopreveal",
+  "version": "0.1.0",
+  "dependencies": [
+    "capstone",
+    "curl",
+    "openssl"
+  ]
+}
