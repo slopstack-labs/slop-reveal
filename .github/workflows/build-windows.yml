@@ -14,16 +14,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache vcpkg packages
+      # Cache compiled vcpkg binary archives so subsequent runs skip recompilation.
+      # Key is tied to vcpkg.json — invalidates only when dependencies change.
+      - name: Cache vcpkg binary archives
         uses: actions/cache@v4
         with:
-          path: C:\vcpkg\packages
+          path: ${{ runner.temp }}/vcpkg-cache
           key: vcpkg-x64-windows-${{ hashFiles('vcpkg.json') }}
           restore-keys: vcpkg-x64-windows-
 
       - name: Install dependencies via vcpkg
         env:
-          VCPKG_BINARY_SOURCES: "clear"
+          VCPKG_BINARY_SOURCES: "clear;files,${{ runner.temp }}/vcpkg-cache,readwrite"
         run: |
           & "$env:VCPKG_INSTALLATION_ROOT\vcpkg.exe" install --triplet x64-windows
 

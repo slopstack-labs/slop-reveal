@@ -2,9 +2,9 @@
 
 **Decompile binaries to source code using AI.**
 
-[![Build (Linux)](https://github.com/omeldar/SlopReveal/actions/workflows/build-linux.yml/badge.svg)](https://github.com/omeldar/SlopReveal/actions/workflows/build-linux.yml)
-[![Build (macOS)](https://github.com/omeldar/SlopReveal/actions/workflows/build-macos.yml/badge.svg)](https://github.com/omeldar/SlopReveal/actions/workflows/build-macos.yml)
-[![Build (Windows)](https://github.com/omeldar/SlopReveal/actions/workflows/build-windows.yml/badge.svg)](https://github.com/omeldar/SlopReveal/actions/workflows/build-windows.yml)
+[![Build (Linux)](https://github.com/slopstack-labs/SlopReveal/actions/workflows/build-linux.yml/badge.svg)](https://github.com/slopstack-labs/SlopReveal/actions/workflows/build-linux.yml)
+[![Build (macOS)](https://github.com/slopstack-labs/SlopReveal/actions/workflows/build-macos.yml/badge.svg)](https://github.com/slopstack-labs/SlopReveal/actions/workflows/build-macos.yml)
+[![Build (Windows)](https://github.com/slopstack-labs/SlopReveal/actions/workflows/build-windows.yml/badge.svg)](https://github.com/slopstack-labs/SlopReveal/actions/workflows/build-windows.yml)
 
 SlopReveal takes a compiled binary, disassembles it with [Capstone](https://www.capstone-engine.org/), and uses a configurable AI provider to predict the original source code — outputting a ready-to-build project in your language of choice.
 
@@ -151,7 +151,7 @@ cmake --build build --config Release
 
 ## Pre-built Binaries
 
-Pre-built executables for each release are attached to [GitHub Releases](https://github.com/omeldar/SlopReveal/releases) for Linux (x64), macOS (arm64 + x64), and Windows (x64).
+Pre-built executables for each release are attached to [GitHub Releases](https://github.com/slopstack-labs/SlopReveal/releases) for Linux (x64), macOS (arm64 + x64), and Windows (x64).
 
 ---
 
