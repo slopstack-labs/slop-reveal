@@ -32,16 +32,37 @@ target_include_directories(slopreveal PRIVATE
 )
 
 # ── Capstone ─────────────────────────────────────────────────────────────────
-# vcpkg exposes capstone via find_package; fall back to pkg-config on Linux/macOS.
+# Resolution order:
+#   1. vcpkg CMake config (Windows)
+#   2. pkg-config (Linux, macOS when PKG_CONFIG_PATH is set)
+#   3. find_path / find_library using CMAKE_PREFIX_PATH (macOS Homebrew fallback)
 find_package(capstone CONFIG QUIET)
 if(TARGET capstone::capstone)
     target_link_libraries(slopreveal PRIVATE capstone::capstone)
 else()
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(CAPSTONE REQUIRED capstone)
-    target_include_directories(slopreveal PRIVATE ${CAPSTONE_INCLUDE_DIRS})
-    target_link_libraries(slopreveal PRIVATE ${CAPSTONE_LIBRARIES})
-    target_link_directories(slopreveal PRIVATE ${CAPSTONE_LIBRARY_DIRS})
+    find_package(PkgConfig QUIET)
+    if(PkgConfig_FOUND)
+        pkg_check_modules(CAPSTONE QUIET capstone)
+    endif()
+
+    if(CAPSTONE_FOUND)
+        target_include_directories(slopreveal PRIVATE ${CAPSTONE_INCLUDE_DIRS})
+        target_link_libraries(slopreveal PRIVATE ${CAPSTONE_LIBRARIES})
+        target_link_directories(slopreveal PRIVATE ${CAPSTONE_LIBRARY_DIRS})
+    else()
+        # Homebrew / manual install: honour CMAKE_PREFIX_PATH
+        find_path(CAPSTONE_INCLUDE_DIR capstone/capstone.h)
+        find_library(CAPSTONE_LIBRARY NAMES capstone)
+        if(NOT CAPSTONE_INCLUDE_DIR OR NOT CAPSTONE_LIBRARY)
+            message(FATAL_ERROR
+                "Capstone not found.\n"
+                "  Linux:  sudo apt install libcapstone-dev\n"
+                "  macOS:  brew install capstone\n"
+                "  Windows: add capstone to vcpkg.json and pass the toolchain file")
+        endif()
+        target_include_directories(slopreveal PRIVATE ${CAPSTONE_INCLUDE_DIR})
+        target_link_libraries(slopreveal PRIVATE ${CAPSTONE_LIBRARY})
+    endif()
 endif()
 
 # ── libcurl ──────────────────────────────────────────────────────────────────
