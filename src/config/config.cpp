@@ -24,9 +24,10 @@ Options:
   -o, --output <dir>        Output directory  [default: out]
       --stdout              Print generated code to stdout only
   -C, --config <path>       TOML config file  [default: slopreveal.toml]
-      --chunk-size <n>      Instructions per AI request chunk  [default: 200]
+      --chunk-size <n>      Bytes (normal) or instructions (--pessimistic) per AI request  [default: 200]
       --no-cache            Disable result cache
       --cache-dir <dir>     Cache directory  [default: .slopreveal_cache]
+  -P, --pessimistic         Disassemble with Capstone first, then decompile (slower, more structured)
   -t, --tui                 Launch interactive TUI mode
   -v, --verbose             Verbose output
   -h, --help                Show this help
@@ -56,14 +57,15 @@ static const struct option LONG_OPTS[] = {
     {"config",     required_argument, nullptr, 'C'},
     {"chunk-size", required_argument, nullptr, 'S'},
     {"cache-dir",  required_argument, nullptr, 'D'},
-    {"stdout",     no_argument,       nullptr, 's'},
-    {"no-cache",   no_argument,       nullptr, 'n'},
-    {"tui",        no_argument,       nullptr, 't'},
-    {"verbose",    no_argument,       nullptr, 'v'},
-    {"help",       no_argument,       nullptr, 'h'},
+    {"stdout",      no_argument,       nullptr, 's'},
+    {"no-cache",    no_argument,       nullptr, 'n'},
+    {"pessimistic", no_argument,       nullptr, 'P'},
+    {"tui",         no_argument,       nullptr, 't'},
+    {"verbose",     no_argument,       nullptr, 'v'},
+    {"help",        no_argument,       nullptr, 'h'},
     {nullptr, 0, nullptr, 0}
 };
-static const char* SHORT_OPTS = "b:p:m:k:u:a:l:o:C:S:D:sntvh";
+static const char* SHORT_OPTS = "b:p:m:k:u:a:l:o:C:S:D:snPtvh";
 
 void Config::print_help(const char* prog) {
     std::cout << "slopreveal - decompile binaries with AI\n" << HELP_TEXT;
@@ -90,6 +92,7 @@ void Config::apply_toml(AppConfig& cfg, const std::string& path) {
 
     if (auto v = tbl["disasm"]["arch"].value<std::string>())          cfg.disasm.arch = *v;
     if (auto v = tbl["disasm"]["chunk_size"].value<int64_t>())        cfg.disasm.chunk_size = static_cast<std::size_t>(*v);
+    if (auto v = tbl["disasm"]["pessimistic"].value<bool>())          cfg.pessimistic = *v;
 }
 
 void Config::apply_env(AppConfig& cfg) {
@@ -140,6 +143,7 @@ static void parse_cli_into(AppConfig& cfg, int argc, char** argv) {
             case 'D': cfg.cache.cache_dir = optarg; break;
             case 's': cfg.output.stdout_only = true; break;
             case 'n': cfg.cache.enabled = false; break;
+            case 'P': cfg.pessimistic = true; break;
             case 't': cfg.interactive = true; break;
             case 'v': cfg.output.verbose = true; break;
             case 'h': Config::print_help(argv[0]); std::exit(0);

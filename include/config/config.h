@@ -34,6 +34,7 @@ struct AppConfig {
     OutputConfig output;
     DisasmConfig disasm;
     bool interactive = false;
+    bool pessimistic = false;
 };
 
 class Config {

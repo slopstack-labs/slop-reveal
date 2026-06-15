@@ -19,13 +19,27 @@ Pre-built binaries from the latest `main` commit — updated automatically on ev
 
 > Powered by [nightly.link](https://nightly.link). Links always point to the latest successful build — no GitHub login required.
 
-SlopReveal takes a compiled binary, disassembles it with [Capstone](https://www.capstone-engine.org/), and uses a configurable AI provider to predict the original source code — outputting a ready-to-build project in your language of choice.
+SlopReveal takes a compiled binary and uses a configurable AI provider to predict the original source code — outputting a ready-to-build project in your language of choice.
+
+---
+
+## Modes
+
+| Mode | Flag | How it works |
+|------|------|--------------|
+| **Normal** (default) | _(none)_ | Sends raw binary bytes as a hex dump directly to the AI — no disassembly step. Fast, works on any format. |
+| **Pessimistic** | `--pessimistic` | Disassembles with [Capstone](https://www.capstone-engine.org/) first, then sends structured assembly to the AI chunk by chunk. Slower, but provides the model with cleaner instruction-level context. |
+
+Both modes cache results per chunk by SHA-256 binary hash, so re-running an unchanged binary skips re-inference.
+
+`--chunk-size` controls **bytes** in normal mode and **instructions** in pessimistic mode (default: `200` in both cases — consider raising it in normal mode, e.g. `--chunk-size 1024`).
 
 ---
 
 ## Features
 
-- **Auto-detects architecture** from ELF/PE headers (x86, x64, ARM, ARM64, MIPS)
+- **Two decompilation modes**: normal (raw binary → AI) and pessimistic (disassemble → AI)
+- **Auto-detects architecture** from ELF/PE headers in pessimistic mode (x86, x64, ARM, ARM64, MIPS)
 - **Four AI providers**: Claude, Ollama (local), OpenAI, Gemini
 - **Result caching** by SHA-256 binary hash — skip re-sending unchanged chunks
 - **Multi-language output**: C, C++, Rust, Python — with generated CMakeLists / Cargo.toml
@@ -41,9 +55,12 @@ SlopReveal takes a compiled binary, disassembles it with [Capstone](https://www.
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 
-# Decompile with Claude (set ANTHROPIC_API_KEY)
+# Normal mode (default) — raw binary sent directly to AI
 export ANTHROPIC_API_KEY=sk-ant-...
 ./build/slopreveal /path/to/binary
+
+# Pessimistic mode — disassemble with Capstone first, then decompile
+./build/slopreveal --pessimistic /path/to/binary
 
 # Decompile with Ollama (no key needed, runs locally)
 ./build/slopreveal -p ollama -m codellama /path/to/binary
@@ -73,7 +90,8 @@ Generated files land in `out/` with a `CMakeLists.txt` (or `Cargo.toml` for Rust
 | `--output <dir>` | `-o` | `out` | Output directory |
 | `--stdout` | | | Print to stdout only |
 | `--config <path>` | `-C` | `slopreveal.toml` | TOML config file |
-| `--chunk-size <n>` | | `200` | Assembly instructions per AI request |
+| `--chunk-size <n>` | | `200` | Bytes per request (normal) or instructions per request (pessimistic) |
+| `--pessimistic` | `-P` | | Disassemble with Capstone first, then decompile |
 | `--no-cache` | | | Disable result cache |
 | `--cache-dir <dir>` | | `.slopreveal_cache` | Cache directory |
 | `--verbose` | `-v` | | Verbose logging |
@@ -170,6 +188,23 @@ Pre-built executables for each release are attached to [GitHub Releases](https:/
 
 ## How It Works
 
+**Normal mode (default)**
+```
+Binary file
+    │
+    ▼
+Split into N chunks of --chunk-size bytes
+    │
+    ▼  (SHA-256 cache check per chunk)
+AI provider → source code prediction per chunk (hex dump prompt)
+    │
+    ▼
+Output writer → out/ directory
+    ├── decompiled.c   (or .cpp / .rs / .py)
+    └── CMakeLists.txt (or Cargo.toml)
+```
+
+**Pessimistic mode (`--pessimistic`)**
 ```
 Binary file
     │
@@ -177,10 +212,10 @@ Binary file
 ELF/PE parser → extract .text section + detect arch
     │
     ▼
-Capstone disassembler → N × assembly chunks (200 insns each)
+Capstone disassembler → N × assembly chunks (--chunk-size insns each)
     │
     ▼  (SHA-256 cache check per chunk)
-AI provider → source code prediction per chunk
+AI provider → source code prediction per chunk (assembly prompt)
     │
     ▼
 Output writer → out/ directory
