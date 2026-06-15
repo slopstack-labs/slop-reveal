@@ -2,9 +2,22 @@
 
 **Decompile binaries to source code using AI.**
 
-[![Build (Linux)](https://github.com/slopstack-labs/SlopReveal/actions/workflows/build-linux.yml/badge.svg)](https://github.com/slopstack-labs/SlopReveal/actions/workflows/build-linux.yml)
-[![Build (macOS)](https://github.com/slopstack-labs/SlopReveal/actions/workflows/build-macos.yml/badge.svg)](https://github.com/slopstack-labs/SlopReveal/actions/workflows/build-macos.yml)
-[![Build (Windows)](https://github.com/slopstack-labs/SlopReveal/actions/workflows/build-windows.yml/badge.svg)](https://github.com/slopstack-labs/SlopReveal/actions/workflows/build-windows.yml)
+[![Build (Linux)](https://github.com/slopstack-labs/slop-reveal/actions/workflows/build-linux.yml/badge.svg)](https://github.com/slopstack-labs/slop-reveal/actions/workflows/build-linux.yml)
+[![Build (macOS)](https://github.com/slopstack-labs/slop-reveal/actions/workflows/build-macos.yml/badge.svg)](https://github.com/slopstack-labs/slop-reveal/actions/workflows/build-macos.yml)
+[![Build (Windows)](https://github.com/slopstack-labs/slop-reveal/actions/workflows/build-windows.yml/badge.svg)](https://github.com/slopstack-labs/slop-reveal/actions/workflows/build-windows.yml)
+
+## Download Latest Build
+
+Pre-built binaries from the latest `main` commit — updated automatically on every push.
+
+| Platform | Download |
+|---|---|
+| Linux x64 | [slopreveal-linux-x64.zip](https://nightly.link/slopstack-labs/slop-reveal/workflows/build-linux.yml/main/slopreveal-linux-x64.zip) |
+| macOS arm64 (Apple Silicon) | [slopreveal-macos-arm64.zip](https://nightly.link/slopstack-labs/slop-reveal/workflows/build-macos.yml/main/slopreveal-macos-arm64.zip) |
+| macOS x64 (Intel) | [slopreveal-macos-x64.zip](https://nightly.link/slopstack-labs/slop-reveal/workflows/build-macos.yml/main/slopreveal-macos-x64.zip) |
+| Windows x64 | [slopreveal-windows-x64.zip](https://nightly.link/slopstack-labs/slop-reveal/workflows/build-windows.yml/main/slopreveal-windows-x64.zip) |
+
+> Powered by [nightly.link](https://nightly.link). Links always point to the latest successful build — no GitHub login required.
 
 SlopReveal takes a compiled binary, disassembles it with [Capstone](https://www.capstone-engine.org/), and uses a configurable AI provider to predict the original source code — outputting a ready-to-build project in your language of choice.
 
