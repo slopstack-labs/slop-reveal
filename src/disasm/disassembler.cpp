@@ -195,7 +195,7 @@ Disassembler::Disassembler(const std::string& arch_hint) : arch_(arch_hint) {
 
 Disassembler::~Disassembler() {
     if (cs_handle_) {
-        csh h = reinterpret_cast<csh>(reinterpret_cast<uintptr_t>(cs_handle_));
+        csh h = static_cast<csh>(reinterpret_cast<uintptr_t>(cs_handle_));
         cs_close(&h);
     }
 }

@@ -4,7 +4,11 @@
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
-#include <getopt.h>
+#ifdef _WIN32
+#  include <getopt_compat.h>
+#else
+#  include <getopt.h>
+#endif
 
 static const char* HELP_TEXT = R"(
 Usage: slopreveal [OPTIONS] <binary>

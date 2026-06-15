@@ -33,43 +33,46 @@ target_include_directories(slopreveal PRIVATE
 
 # ── Capstone ─────────────────────────────────────────────────────────────────
 # Resolution order:
-#   1. vcpkg CMake config target (Windows via toolchain file)
-#   2. Explicit -DCAPSTONE_INCLUDE_DIR / -DCAPSTONE_LIBRARY cache vars (macOS CI)
+#   1. Explicit -DCAPSTONE_INCLUDE_DIR / -DCAPSTONE_LIBRARY cache vars (macOS CI)
+#      These must come first: capstone 5.x ships cmake config files, so
+#      find_package(capstone CONFIG) succeeds on macOS but the imported target
+#      does not propagate include directories, silently breaking the build.
+#   2. vcpkg CMake config target (Windows via toolchain file)
 #   3. pkg-config (Linux, macOS when PKG_CONFIG_PATH is correctly set)
 #   4. find_path / find_library via CMAKE_PREFIX_PATH (last resort)
-find_package(capstone CONFIG QUIET)
-if(TARGET capstone::capstone)
-    target_link_libraries(slopreveal PRIVATE capstone::capstone)
-elseif(CAPSTONE_INCLUDE_DIR AND CAPSTONE_LIBRARY)
-    # Explicit paths supplied via -D flags take priority over pkg-config so that
-    # brew installs on macOS CI always win (pkg-config may return empty Cflags).
+if(CAPSTONE_INCLUDE_DIR AND CAPSTONE_LIBRARY)
     message(STATUS "Capstone: using explicit paths")
     message(STATUS "  include: ${CAPSTONE_INCLUDE_DIR}")
     message(STATUS "  library: ${CAPSTONE_LIBRARY}")
     target_include_directories(slopreveal PRIVATE "${CAPSTONE_INCLUDE_DIR}")
     target_link_libraries(slopreveal PRIVATE "${CAPSTONE_LIBRARY}")
 else()
-    find_package(PkgConfig QUIET)
-    if(PkgConfig_FOUND)
-        pkg_check_modules(CAPSTONE QUIET capstone)
-    endif()
-
-    if(CAPSTONE_FOUND AND CAPSTONE_INCLUDE_DIRS)
-        target_include_directories(slopreveal PRIVATE ${CAPSTONE_INCLUDE_DIRS})
-        target_link_libraries(slopreveal PRIVATE ${CAPSTONE_LIBRARIES})
-        target_link_directories(slopreveal PRIVATE ${CAPSTONE_LIBRARY_DIRS})
+    find_package(capstone CONFIG QUIET)
+    if(TARGET capstone::capstone)
+        target_link_libraries(slopreveal PRIVATE capstone::capstone)
     else()
-        find_path(CAPSTONE_INCLUDE_DIR NAMES capstone/capstone.h)
-        find_library(CAPSTONE_LIBRARY NAMES capstone)
-        if(NOT CAPSTONE_INCLUDE_DIR OR NOT CAPSTONE_LIBRARY)
-            message(FATAL_ERROR
-                "Capstone not found.\n"
-                "  Linux:   sudo apt install libcapstone-dev\n"
-                "  macOS:   brew install capstone  (then pass -DCAPSTONE_INCLUDE_DIR / -DCAPSTONE_LIBRARY)\n"
-                "  Windows: add capstone to vcpkg.json and pass -DCMAKE_TOOLCHAIN_FILE")
+        find_package(PkgConfig QUIET)
+        if(PkgConfig_FOUND)
+            pkg_check_modules(CAPSTONE QUIET capstone)
         endif()
-        target_include_directories(slopreveal PRIVATE "${CAPSTONE_INCLUDE_DIR}")
-        target_link_libraries(slopreveal PRIVATE "${CAPSTONE_LIBRARY}")
+
+        if(CAPSTONE_FOUND AND CAPSTONE_INCLUDE_DIRS)
+            target_include_directories(slopreveal PRIVATE ${CAPSTONE_INCLUDE_DIRS})
+            target_link_libraries(slopreveal PRIVATE ${CAPSTONE_LIBRARIES})
+            target_link_directories(slopreveal PRIVATE ${CAPSTONE_LIBRARY_DIRS})
+        else()
+            find_path(CAPSTONE_INCLUDE_DIR NAMES capstone/capstone.h)
+            find_library(CAPSTONE_LIBRARY NAMES capstone)
+            if(NOT CAPSTONE_INCLUDE_DIR OR NOT CAPSTONE_LIBRARY)
+                message(FATAL_ERROR
+                    "Capstone not found.\n"
+                    "  Linux:   sudo apt install libcapstone-dev\n"
+                    "  macOS:   brew install capstone  (then pass -DCAPSTONE_INCLUDE_DIR / -DCAPSTONE_LIBRARY)\n"
+                    "  Windows: add capstone to vcpkg.json and pass -DCMAKE_TOOLCHAIN_FILE")
+            endif()
+            target_include_directories(slopreveal PRIVATE "${CAPSTONE_INCLUDE_DIR}")
+            target_link_libraries(slopreveal PRIVATE "${CAPSTONE_LIBRARY}")
+        endif()
     endif()
 endif()
 
