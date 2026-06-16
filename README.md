@@ -23,6 +23,15 @@ SlopReveal takes a compiled binary and uses a configurable AI provider to predic
 
 ---
 
+## Getting Started
+
+| Guide | Description |
+|-------|-------------|
+| [Example binary](examples/README.md) | Build and decompile a simple `hello_calc` binary — the fastest way to see SlopReveal in action |
+| [Install Ollama](docs/install-ollama.md) | Run models locally for free on Linux and Windows (no API key needed) |
+
+---
+
 ## Modes
 
 | Mode | Flag | How it works |
